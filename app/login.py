@@ -1,7 +1,11 @@
-from flask import Flask, request, url_for, redirect, session
-from flask_login import LoginManager, login_user
+from flask import Flask, request, url_for, redirect, session, flash
+from flask.ext.admin import Admin
+from flask_login import LoginManager, login_user, load_user
 from flask_oauth import OAuth
+from flask.ext.sqlalchemy import SQLAlchemy
+from flask.ext.admin.contrib.sqla import ModelView
 from app import app
+from app import db
 from app import datastore
 from datastore import User
 
