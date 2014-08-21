@@ -1,6 +1,9 @@
+from flask.ext.sqlalchemy import SQLAlchemy
+from flask.ext.admin.contrib.sqla import ModelView
 from app import app
 from app import db
 
+# User
 class User(db.Model):
   __tablename__ = 'users'
   id = db.Column(db.Integer, primary_key=True)
@@ -25,3 +28,5 @@ class User(db.Model):
 
   def get_id(self):
     return unicode(self.id)
+
+db.create_all()

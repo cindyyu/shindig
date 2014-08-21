@@ -1,10 +1,9 @@
 from flask import Flask, request, url_for, redirect, session
-from flask_login import LoginManager, login_user
+from flask_login import LoginManager, login_user, logout_user, login_required
 from flask_oauth import OAuth
 from app import app
 from app import datastore
 from datastore import User
-
 
 # Flask-Login Configuration
 
@@ -33,31 +32,37 @@ facebook = oauth.remote_app('facebook',
 
 @facebook.tokengetter
 def get_facebook_oauth_token():
-    return session.get('oauth_token')
+  return session.get('oauth_token')
 
 @app.route('/login')
 def facebook_login():
   next_url = request.args.get('next') or url_for('index')
   return facebook.authorize(callback=url_for('facebook_authorized',
-      next=next_url,
-      _external=True))
+    next=next_url,
+    _external=True))
 
 @app.route('/login/authorized')
 @facebook.authorized_handler
 def facebook_authorized(resp):
-    next_url = request.args.get('next') or url_for('index')
-    if resp is None:
-        # The user likely denied the request
-        flash(u'There was a problem logging in.')
-        return redirect(next_url)
-    session['oauth_token'] = (resp['access_token'], '')
-    user_data = facebook.get('/me').data
-    user = User.query.filter(User.email == user_data['email']).first()
-    if user is None:
-        new_user = User(email=user_data['email'], first_name=user_data['first_name'], last_name=user_data['last_name'])
-        db.session.add(new_user)
-        db.session.commit()
-        login_user(new_user)
-    else:
-        login_user(user)
+  next_url = request.args.get('next') or url_for('index')
+  if resp is None:
+    # The user likely denied the request
+    flash(u'There was a problem logging in.')
     return redirect(next_url)
+  session['oauth_token'] = (resp['access_token'], '')
+  user_data = facebook.get('/me').data
+  user = User.query.filter(User.email == user_data['email']).first()
+  if user is None:
+    new_user = User(email=user_data['email'], first_name=user_data['first_name'], last_name=user_data['last_name'])
+    db.session.add(new_user)
+    db.session.commit()
+    login_user(new_user)
+  else:
+    login_user(user)
+  return redirect(next_url)
+
+@app.route("/logout")
+@login_required
+def logout():
+  logout_user()
+  return redirect('/')
