@@ -36,7 +36,7 @@ def get_facebook_oauth_token():
 
 @app.route('/login')
 def facebook_login():
-  next_url = request.args.get('next') or url_for('index')
+  next_url = request.args.get('next') or url_for('dashboard')
   return facebook.authorize(callback=url_for('facebook_authorized',
     next=next_url,
     _external=True))
@@ -44,7 +44,7 @@ def facebook_login():
 @app.route('/login/authorized')
 @facebook.authorized_handler
 def facebook_authorized(resp):
-  next_url = request.args.get('next') or url_for('index')
+  next_url = request.args.get('next') or url_for('dashboard')
   if resp is None:
     # The user likely denied the request
     flash(u'There was a problem logging in.')
