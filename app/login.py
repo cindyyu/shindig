@@ -1,8 +1,9 @@
-from flask import Flask, request, url_for, redirect, session
+from flask import Flask, request, url_for, redirect, session, flash
 from flask_login import LoginManager, login_user, logout_user, login_required
 from flask_oauth import OAuth
 from app import app
 from app import datastore
+from app import db
 from datastore import User
 
 # Flask-Login Configuration
@@ -12,9 +13,10 @@ login_manager.init_app(app)
 
 @login_manager.user_loader
 def load_user(userid): 
-	user = User.query.get(int(userid))
-	if user: 
-		return user
+  if userid is not None: 
+  	user = User.query.get(userid)
+  	if user: 
+  		return user
 
 # OAuth Configuration
 
@@ -53,7 +55,7 @@ def facebook_authorized(resp):
   user_data = facebook.get('/me').data
   user = User.query.filter(User.email == user_data['email']).first()
   if user is None:
-    new_user = User(email=user_data['email'], first_name=user_data['first_name'], last_name=user_data['last_name'])
+    new_user = User(user_id=user_data['id'], email=user_data['email'], first_name=user_data['first_name'], last_name=user_data['last_name'])
     db.session.add(new_user)
     db.session.commit()
     login_user(new_user)
