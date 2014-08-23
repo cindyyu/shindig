@@ -5,6 +5,8 @@ from app import app
 from app import datastore
 from app import db
 from datastore import User
+import facebook
+from facebook import GraphAPI
 
 # Flask-Login Configuration
 
@@ -22,29 +24,29 @@ def load_user(userid):
 
 oauth = OAuth()
  
-facebook = oauth.remote_app('facebook',
+facebook_oauth = oauth.remote_app('facebook',
   base_url='https://graph.facebook.com/',
   request_token_url=None,
   access_token_url='/oauth/access_token',
   authorize_url='https://www.facebook.com/dialog/oauth',
   consumer_key='941129455902199',
   consumer_secret='529258ac1fc1e7a38e17ae8d13d684ec',
-  request_token_params={'scope': 'email'}
+  request_token_params={'scope': 'email, public_profile'}
 )
 
-@facebook.tokengetter
+@facebook_oauth.tokengetter
 def get_facebook_oauth_token():
   return session.get('oauth_token')
 
 @app.route('/login')
 def facebook_login():
   next_url = request.args.get('next') or url_for('dashboard')
-  return facebook.authorize(callback=url_for('facebook_authorized',
+  return facebook_oauth.authorize(callback=url_for('facebook_authorized',
     next=next_url,
     _external=True))
 
 @app.route('/login/authorized')
-@facebook.authorized_handler
+@facebook_oauth.authorized_handler
 def facebook_authorized(resp):
   next_url = request.args.get('next') or url_for('dashboard')
   if resp is None:
@@ -52,10 +54,13 @@ def facebook_authorized(resp):
     flash(u'There was a problem logging in.')
     return redirect(next_url)
   session['oauth_token'] = (resp['access_token'], '')
-  user_data = facebook.get('/me').data
+  graph = facebook.GraphAPI(resp['access_token'])
+  picture = graph.get_object("/me/picture")['url']
+  friends = graph.get_object('me/friends')
+  user_data = facebook_oauth.get('/me').data
   user = User.query.filter(User.email == user_data['email']).first()
   if user is None:
-    new_user = User(user_id=user_data['id'], email=user_data['email'], first_name=user_data['first_name'], last_name=user_data['last_name'])
+    new_user = User(user_id=user_data['id'], email=user_data['email'], first_name=user_data['first_name'], last_name=user_data['last_name'], picture=picture)
     db.session.add(new_user)
     db.session.commit()
     login_user(new_user)

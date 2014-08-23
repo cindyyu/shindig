@@ -13,14 +13,16 @@ class User(db.Model):
   last_name = db.Column(db.String)
   host_of = db.Column(db.String)
   events = db.Column(db.String)
+  picture = db.Column(db.String)
 
-  def __init__(self, email, first_name=None, last_name=None, user_id=None, host_of=None, events=None):
+  def __init__(self, email, first_name=None, last_name=None, user_id=None, host_of=None, events=None, picture=None):
     self.email = email.lower()
     self.user_id = user_id
     self.first_name = first_name
     self.last_name = last_name
     self.host_of = host_of
     self.events = events
+    self.picture = picture
 
   # These four methods are for Flask-Login
   def is_authenticated(self):
