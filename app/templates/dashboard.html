@@ -1,7 +1,12 @@
 {% extends 'base.html' %}
 {% block content %}
-{% if events_string %}
   events hosting:
-  {{ events_string }}
-{% endif %}
+  {% for event in events_hosting %}
+    {{ event.name }}
+  {% endfor %}
+  <br />
+  events attending: 
+  {% for event in events_attending %}
+    {{ event.name }}
+  {% endfor %}
 {% endblock content %}

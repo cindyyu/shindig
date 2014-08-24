@@ -6,3 +6,7 @@ class EventCreateForm(Form):
   start = DateTimeField('Start Time')
   end = DateTimeField('End Time')
   
+class EventPreferenceForm(Form):
+  start = DateTimeField('Start Time')
+  end = DateTimeField('End Time')
+  location = StringField('Location')
