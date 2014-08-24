@@ -4,7 +4,8 @@ from flask.ext.admin import Admin
 from app import app
 from app import db
 from app import datastore
-from datastore import User
+from datastore import User, Events
 
 admin = Admin(app)
 admin.add_view(ModelView(User, db.session))
+admin.add_view(ModelView(Events, db.session))
