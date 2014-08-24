@@ -1,4 +1,11 @@
 {% extends 'base.html' %}
 {% block content %}
-this is the index
+{% if events %}
+  events attending: 
+  {% for event in events %}
+    {{ event.name }}
+  {% endfor %}
+{% else %}
+  no events!
+{% endif %}
 {% endblock content %}

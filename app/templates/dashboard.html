@@ -1,4 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
-this is the dashboard
+{% if events_string %}
+  events hosting:
+  {{ events_string }}
+{% endif %}
 {% endblock content %}
