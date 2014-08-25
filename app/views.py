@@ -3,10 +3,11 @@ from flask_login import login_required, current_user
 from app import app
 from app import db
 from app import forms
-from forms import EventCreateForm, EventPreferenceForm
+from forms import EventCreateForm, EventPreferenceForm, EventJoinForm
 from app import datastore
 from datastore import Event, User, attendance, Preference
 from sqlalchemy import desc
+from passlib.hash import sha256_crypt
 
 def is_attendee_or_host(user, event):
   if user == event.host or user in event.attendees :
@@ -51,7 +52,8 @@ def events_create():
   form = EventCreateForm(request.form)
   # if form was submitted
   if request.method == 'POST' and form.validate():
-    new_event = Event(name=form.name.data, host=current_user, start_time=form.start.data, end_time=form.end.data)
+    password = sha256_crypt.encrypt(form.password.data)
+    new_event = Event(name=form.name.data, host=current_user, start_time=form.start.data, end_time=form.end.data, password=password)
     db.session.add(new_event)
     db.session.commit()
     return str(attendance)
@@ -60,16 +62,23 @@ def events_create():
     return render_template('events_create.html', form=form)
 
 # Join Event: allows user to join an event *** TO ADD: PASSWORD TO JOIN ***
-@app.route('/events/join/<int:event_id>')
+@app.route('/events/join/<int:event_id>', methods=['GET', 'POST'])
 @login_required
 def events_join(event_id):
+  form = EventJoinForm(request.form)
   event = Event.query.filter(Event.id == event_id).first()
   # check if current user is already attendee or host
   # if not, add them
   if current_user not in event.attendees and current_user != event.host :
-    event.attendees.append(current_user)
-    db.session.commit()
-    return 'you have joined!'
+    if request.method == 'POST' and form.validate():
+      if sha256_crypt.verify(form.password.data, event.password) :
+        event.attendees.append(current_user)
+        db.session.commit()
+        return 'you have joined!'
+      else :
+        return 'wrong pass yo'
+    else : 
+      return render_template('events_join.html', form=form, event_id=event_id)
   else :
     return redirect(url_for('events_view', event_id=event_id))
 

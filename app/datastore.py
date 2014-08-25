@@ -49,6 +49,7 @@ class Event(db.Model):
   start_time = db.Column(db.DateTime)
   end_time = db.Column(db.DateTime)
   location = db.Column(db.String)
+  password = db.Column(db.String)
   user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
   attendees = db.relationship(
     'User', 
