@@ -1,1 +1,9 @@
-{% block content %}{% endblock %}
+<html>
+  <head>
+     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  </head>
+  <body>
+    {% block content %}{% endblock %}
+  </body>
+</html>

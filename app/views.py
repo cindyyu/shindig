@@ -8,6 +8,8 @@ from app import datastore
 from datastore import Event, User, attendance, Preference
 from sqlalchemy import desc
 from passlib.hash import sha256_crypt
+from datetime import date
+import calendar, json
 
 def is_attendee_or_host(user, event):
   if user == event.host or user in event.attendees :
@@ -52,12 +54,14 @@ def events_create():
   form = EventCreateForm(request.form)
   # if form was submitted
   if request.method == 'POST' and form.validate():
-    password = sha256_crypt.encrypt(form.password.data)
+    password = sha256_crypt.encrypt(form.password.data) if form.password.data else None
     new_event = Event(name=form.name.data, host=current_user, start_time=form.start.data, end_time=form.end.data, password=password)
     db.session.add(new_event)
     db.session.commit()
     return str(attendance)
   # if form was not submitted (get request)
+  elif not form.validate():
+    return str(form.errors)
   else :
     return render_template('events_create.html', form=form)
 
@@ -71,12 +75,17 @@ def events_join(event_id):
   # if not, add them
   if current_user not in event.attendees and current_user != event.host :
     if request.method == 'POST' and form.validate():
-      if sha256_crypt.verify(form.password.data, event.password) :
+      if event.password :
+        if sha256_crypt.verify(form.password.data, event.password) :
+          event.attendees.append(current_user)
+          db.session.commit()
+          return 'you have joined!'
+        else :
+          return 'wrong pass yo'
+      else :
         event.attendees.append(current_user)
         db.session.commit()
         return 'you have joined!'
-      else :
-        return 'wrong pass yo'
     else : 
       return render_template('events_join.html', form=form, event_id=event_id)
   else :
@@ -98,20 +107,50 @@ def events_leave(event_id):
 @app.route('/events/preferences/<int:event_id>', methods=['GET', 'POST'])
 @login_required
 def events_preferences(event_id):
+  today = date.today()
   form = EventPreferenceForm(request.form)
   event = Event.query.get(event_id)
+
+  # check if user is either a host or attendee
   if is_attendee_or_host(current_user, event) :
-    # if form was submitted
-    if request.method == 'POST' and form.validate():
-      # check if preference already exists
-      if Preference.attendee == current_user : 
-        return 'already!'
-      else :
-        new_preference = Preference(attendee_id=current_user.id, event_id=event_id, start_time=form.start.data)
+    # check if a permission already exists
+    if Preference.query.filter(Preference.attendee.has(id=current_user.id) & Preference.event.has(id=event_id)).count() != 0 : 
+      preference = Preference.query.filter(Preference.attendee.has(id=current_user.id) & Preference.event.has(id=event_id)).first()
+      available_times = json.loads(preference.availability)
+      return 'preference already created'
+    else :
+      # check to see if the form was submitted
+      if request.method == 'POST' and form.validate():
+        new_preference = Preference(attendee_id=current_user.id, event_id=event_id, availability=form.availability.data, willing_to_spend=int(form.willing_to_spend.data), location=form.location.data)
         db.session.add(new_preference)
         db.session.commit()
         return 'added!'
-    else :
-      return render_template('events_preference.html', form=form, event_id=event_id)
+      else :
+        return render_template('events_preference.html', form=form, event_id=event_id, today=today, calendar=calendar)
   else :
-    return 'u dont even go here'
+    return 'you dont have permission'
+
+# Analyze Preferences
+@app.route('/events/generate/<int:event_id>', methods=['GET', 'POST'])
+@login_required
+def events_generate(event_id):
+  preferences = Preference.query.filter(Preference.event.has(id=event_id))
+  possible_dates = {}
+  possible_locations = []
+  possible_willing_to_spend = []
+  # Gather preferences and place them into lists/dictionaries we can parse through later
+  for preference in preferences :
+    # For each preference, load its available dates
+    available_dates = json.loads(preference.availability)
+    # Add available dates to a dictionary and record the number of people that date works for
+    for available_date in available_dates : 
+      if available_date['date'] in possible_dates :
+        possible_dates[available_date['date']] += 1
+      else :
+        possible_dates[available_date['date']] = 1
+    possible_willing_to_spend.append(preference.willing_to_spend)
+    possible_locations.append(preference.location)
+  # Get optimal meeting dates, willing_to_spend, location
+  optimal_date = max(possible_dates, key=possible_dates.get)
+  optimal_willing_to_spend = sum(possible_willing_to_spend)/len(possible_willing_to_spend)
+  return str(optimal_willing_to_spend)

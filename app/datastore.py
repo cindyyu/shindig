@@ -50,6 +50,7 @@ class Event(db.Model):
   end_time = db.Column(db.DateTime)
   location = db.Column(db.String)
   password = db.Column(db.String)
+  categories = db.Column(db.PickleType)
   user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
   attendees = db.relationship(
     'User', 
@@ -57,6 +58,15 @@ class Event(db.Model):
     backref=db.backref('events', lazy='dynamic')
   )
   preferences = db.relationship('Preference', backref='event', lazy='dynamic')
+
+  def __init__(self, name, host, start_time=None, end_time=None, location=None, password=None, categories=None): 
+    self.name = name
+    self.host = host
+    self.start_time = start_time
+    self.end_time = end_time
+    self.location = location
+    self.password = password
+    self.categories = categories
 
   def url_view(self):
     return '/events/view/' + str(self.id)
@@ -67,8 +77,9 @@ class Preference(db.Model):
   id = db.Column(db.Integer, primary_key=True)
   attendee_id = db.Column(db.Integer, db.ForeignKey('user.id'))
   event_id = db.Column(db.Integer, db.ForeignKey('event.id'))
-  start_time = db.Column(db.DateTime)
-  end_time = db.Column(db.DateTime)
+  availability = db.Column(db.PickleType)
+  willing_to_spend = db.Column(db.Integer)
   location = db.Column(db.String)
+  attending = db.Column(db.Boolean)
 
 db.create_all()
