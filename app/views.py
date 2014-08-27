@@ -2,14 +2,16 @@ from flask import render_template, request, session, url_for, redirect
 from flask_login import login_required, current_user
 from app import app
 from app import db
-from app import forms
+from app import forms, datastore
 from forms import EventCreateForm, EventPreferenceForm, EventJoinForm
-from app import datastore
 from datastore import Event, User, attendance, Preference
 from sqlalchemy import desc
 from passlib.hash import sha256_crypt
 from datetime import date
+from geopy.geocoders import Nominatim
 import calendar, json
+
+geolocator = Nominatim()
 
 def is_attendee_or_host(user, event):
   if user == event.host or user in event.attendees :
@@ -145,12 +147,41 @@ def events_generate(event_id):
     # Add available dates to a dictionary and record the number of people that date works for
     for available_date in available_dates : 
       if available_date['date'] in possible_dates :
-        possible_dates[available_date['date']] += 1
+        possible_dates[available_date['date']]['attendance'] += 1
+        if available_date['start_time'] > possible_dates[available_date['date']]['start_time'] :
+          possible_dates[available_date['date']]['start_time'] = available_date['start_time']
+        if available_date['end_time'] < possible_dates[available_date['date']]['end_time'] :
+          possible_dates[available_date['date']]['end_time'] = available_date['end_time']
       else :
-        possible_dates[available_date['date']] = 1
+        possible_dates[available_date['date']] = {}
+        possible_dates[available_date['date']]['attendance'] = 1
+        possible_dates[available_date['date']]['start_time'] = available_date['start_time']
+        possible_dates[available_date['date']]['end_time'] = available_date['end_time']
     possible_willing_to_spend.append(preference.willing_to_spend)
     possible_locations.append(preference.location)
-  # Get optimal meeting dates, willing_to_spend, location
-  optimal_date = max(possible_dates, key=possible_dates.get)
-  optimal_willing_to_spend = sum(possible_willing_to_spend)/len(possible_willing_to_spend)
-  return str(optimal_willing_to_spend)
+
+  return str(possible_dates)
+  # # Get optimal date: chooses the one with the highest possible attendance
+  # optimal_date = max(possible_dates, key=possible_dates.get)
+  # # Get optimal time: finds the time interval on the optimal date
+  # possible_start_times = []
+  # possible_end_times = []
+  # for available_date in available_dates : 
+  #   if available_date['date'] == optimal_date :
+  #     possible_start_times.append(available_date['start_time'])
+  #     possible_end_times.append(available_date['end_time'])
+  # return str(possible_start_times)
+  # # Get optimal willing_to_spend: averages how much everyone is willing to spend
+  # optimal_willing_to_spend = sum(possible_willing_to_spend)/len(possible_willing_to_spend)
+  # # Get optimal location: average latitude and longitude, return its address
+  # possible_locations_lat = []
+  # possible_locations_lng = []
+  # for possible_location in possible_locations : 
+  #   location = geolocator.geocode(possible_location, timeout=10)
+  #   possible_locations_lat.append(location.latitude)
+  #   possible_locations_lng.append(location.longitude)
+  # optimal_location_lat = sum(possible_locations_lat)/len(possible_locations_lat)
+  # optimal_location_lng = sum(possible_locations_lng)/len(possible_locations_lng)
+  # optimal_location_full = geolocator.reverse(str(optimal_location_lat) + ', ' + str(optimal_location_lng), timeout=10).raw['address']
+  # optimal_location = optimal_location_full['city'] + ', ' + optimal_location_full['state']
+  # return str(available_times)
