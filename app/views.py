@@ -9,9 +9,10 @@ from sqlalchemy import desc
 from passlib.hash import sha256_crypt
 from datetime import date
 from geopy.geocoders import Nominatim
-import calendar, json
+import calendar, json, urllib2, os, foursquare
 
 geolocator = Nominatim()
+foursquare = foursquare.Foursquare(client_id='4032XFZSOCNLGS2F2TDYZOCTRRMACK4T4QK5P4HJZSG4SBS5', client_secret='PIOKXJENSWXYEYIUWW3GQFTAUHCLOLVIOCEOOMEPK3EHMUQV')
 
 def is_attendee_or_host(user, event):
   if user == event.host or user in event.attendees :
@@ -23,7 +24,7 @@ def is_attendee_or_host(user, event):
 @app.route('/index')
 def index():
   if current_user.is_anonymous() : 
-    return 'plz login'
+    return render_template('homepage.html')
   else :
     return redirect('/dashboard')
 
@@ -45,9 +46,9 @@ def events_view(event_id):
     attendees = ''
     for attendee in event.attendees : 
       attendees = attendees + attendee.full_name()
-    return attendees
+    return render_template('events_view.html', event=event, attendees=attendees)
   else :
-    return 'u dont belong'
+    return render_template('events_view.html', error='you dunbelong')
   
 # Create Event: allows user to create an event as a host
 @app.route('/events/create', methods=['GET', 'POST'])
@@ -60,12 +61,12 @@ def events_create():
     new_event = Event(name=form.name.data, host=current_user, start_time=form.start.data, end_time=form.end.data, password=password)
     db.session.add(new_event)
     db.session.commit()
-    return str(attendance)
+    return render_template('events_create.html', method='post')
   # if form was not submitted (get request)
   elif not form.validate():
-    return str(form.errors)
+    return render_template('events_create.html', method='post', error=form.errors)
   else :
-    return render_template('events_create.html', form=form)
+    return render_template('events_create.html', form=form, method='get')
 
 # Join Event: allows user to join an event *** TO ADD: PASSWORD TO JOIN ***
 @app.route('/events/join/<int:event_id>', methods=['GET', 'POST'])
@@ -76,20 +77,20 @@ def events_join(event_id):
   # check if current user is already attendee or host
   # if not, add them
   if current_user not in event.attendees and current_user != event.host :
-    if request.method == 'POST' and form.validate():
+    if request.method == 'POST' and form.validate() :
       if event.password :
         if sha256_crypt.verify(form.password.data, event.password) :
           event.attendees.append(current_user)
           db.session.commit()
-          return 'you have joined!'
+          return render_template('events_join.html', response='you have joined!')
         else :
-          return 'wrong pass yo'
+          return render_template('events_join.html', response='wrong pass yo!')
       else :
         event.attendees.append(current_user)
         db.session.commit()
-        return 'you have joined!'
+        return render_template('events_join.html', response='you have joined!')
     else : 
-      return render_template('events_join.html', form=form, event_id=event_id)
+      return render_template('events_join.html', form=form, event_id=event_id, method='get')
   else :
     return redirect(url_for('events_view', event_id=event_id))
 
@@ -101,9 +102,9 @@ def events_leave(event_id):
   if current_user in event.attendees :
     event.attendees.remove(current_user)
     db.session.commit()
-    return 'you have been removed!'
+    return render_template('events_leave.html', response='you have been removed!')
   else :
-    return 'you not even in it yo'
+    return render_template('events_leave.html', response='you not even in it yo')
 
 # Event Preferences: allows user to add their preferences for a specific event
 @app.route('/events/preferences/<int:event_id>', methods=['GET', 'POST'])
@@ -119,18 +120,18 @@ def events_preferences(event_id):
     if Preference.query.filter(Preference.attendee.has(id=current_user.id) & Preference.event.has(id=event_id)).count() != 0 : 
       preference = Preference.query.filter(Preference.attendee.has(id=current_user.id) & Preference.event.has(id=event_id)).first()
       available_times = json.loads(preference.availability)
-      return 'preference already created'
+      return render_template('events_preferences.html', response='preference already created')
     else :
       # check to see if the form was submitted
       if request.method == 'POST' and form.validate():
         new_preference = Preference(attendee_id=current_user.id, event_id=event_id, availability=form.availability.data, willing_to_spend=int(form.willing_to_spend.data), location=form.location.data)
         db.session.add(new_preference)
         db.session.commit()
-        return 'added!'
+        return render_template('events_preferences.html', response='preference added')
       else :
-        return render_template('events_preference.html', form=form, event_id=event_id, today=today, calendar=calendar)
+        return render_template('events_preferences.html', form=form, event_id=event_id, today=today, calendar=calendar)
   else :
-    return 'you dont have permission'
+    return render_template('events_preferences.html', error='you dont have permission')
 
 # Analyze Preferences
 @app.route('/events/generate/<int:event_id>', methods=['GET', 'POST'])
@@ -140,6 +141,7 @@ def events_generate(event_id):
   possible_dates = {}
   possible_locations = []
   possible_willing_to_spend = []
+  
   # Gather preferences and place them into lists/dictionaries we can parse through later
   for preference in preferences :
     # For each preference, load its available dates
@@ -160,28 +162,18 @@ def events_generate(event_id):
     possible_willing_to_spend.append(preference.willing_to_spend)
     possible_locations.append(preference.location)
 
-  return str(possible_dates)
-  # # Get optimal date: chooses the one with the highest possible attendance
-  # optimal_date = max(possible_dates, key=possible_dates.get)
-  # # Get optimal time: finds the time interval on the optimal date
-  # possible_start_times = []
-  # possible_end_times = []
-  # for available_date in available_dates : 
-  #   if available_date['date'] == optimal_date :
-  #     possible_start_times.append(available_date['start_time'])
-  #     possible_end_times.append(available_date['end_time'])
-  # return str(possible_start_times)
-  # # Get optimal willing_to_spend: averages how much everyone is willing to spend
-  # optimal_willing_to_spend = sum(possible_willing_to_spend)/len(possible_willing_to_spend)
-  # # Get optimal location: average latitude and longitude, return its address
-  # possible_locations_lat = []
-  # possible_locations_lng = []
-  # for possible_location in possible_locations : 
-  #   location = geolocator.geocode(possible_location, timeout=10)
-  #   possible_locations_lat.append(location.latitude)
-  #   possible_locations_lng.append(location.longitude)
-  # optimal_location_lat = sum(possible_locations_lat)/len(possible_locations_lat)
-  # optimal_location_lng = sum(possible_locations_lng)/len(possible_locations_lng)
-  # optimal_location_full = geolocator.reverse(str(optimal_location_lat) + ', ' + str(optimal_location_lng), timeout=10).raw['address']
-  # optimal_location = optimal_location_full['city'] + ', ' + optimal_location_full['state']
-  # return str(available_times)
+  # Get optimal willing_to_spend: averages how much everyone is willing to spend
+  optimal_willing_to_spend = sum(possible_willing_to_spend)/len(possible_willing_to_spend)
+  
+  # Get optimal location: average latitude and longitude, return its address
+  possible_locations_lat = []
+  possible_locations_lng = []
+  for possible_location in possible_locations : 
+    location = geolocator.geocode(possible_location, timeout=10)
+    possible_locations_lat.append(location.latitude)
+    possible_locations_lng.append(location.longitude)
+  optimal_location_latlng = str(sum(possible_locations_lat)/len(possible_locations_lat)) + ', ' + str(sum(possible_locations_lng)/len(possible_locations_lng))
+  optimal_location_full = geolocator.reverse(optimal_location_latlng, timeout=10).raw['address']
+  optimal_location = optimal_location_full['city'] + ', ' + optimal_location_full['state']
+  
+  return str(foursquare.venues.explore(params={'query': 'tacos', 'near': 'Frisco, TX', 'limit': '5', 'sortByDistance': '1', 'time': 'any', 'price': '3'})['groups'][0]['items'])

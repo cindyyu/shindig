@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>view event</h1>
+{% if error %}
+  {{ error }}
+{% else %}
+  Name: {{ event.name }}<br />
+  Attendees: 
+  {{ attendees }}
+{% endif %}
+{% endblock content %}

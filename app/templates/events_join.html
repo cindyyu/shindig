@@ -1,8 +1,12 @@
 {% extends 'base.html' %}
 {% block content %}
 <h1>join event</h1>
+{% if method == 'get' %}
 <form method="post" action="{{ event_id }}">
     <div>{{ form.password.label }}: {{ form.password }}</div>
     <input type="submit" name="submit" value="submit" />
 </form>
+{% else %}
+  {{ response }}
+{% endif %}
 {% endblock content %}

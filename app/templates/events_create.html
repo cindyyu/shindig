@@ -1,5 +1,12 @@
 {% extends 'base.html' %}
 {% block content %}
+{% if method == 'post' %}
+  {% if error %}
+    {{ error }}
+  {% else %}
+    your event has beenc reated!
+  {% endif %}
+{% else %}
 <h1>new event</h1>
 <form method="post" action="create">
     <div>{{ form.name.label }}: {{ form.name }}</div>
@@ -8,4 +15,5 @@
     <div>{{ form.end.label }}: {{ form.end }}</div>
     <input type="submit" name="submit" value="submit" />
 </form>
+{% endif %}
 {% endblock content %}
