@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>results</h1>
+{% for possible_venue in possible_venues %}
+  {% set venue = possible_venue['venue'] %}
+  <h2>{{ venue['name'] }}</h2>
+  <h3>{{ venue['location']['address'] }} {{ venue['location']['city'] }}, {{ venue['location']['state'] }}</h3>
+  <h4>
+  {% for i in range(0, venue['price']['tier']) %}
+    $
+  {% endfor %}
+  </h4>
+{% endfor %}
+<h2>best time</h2>
+{{ optimal_date }}
+{% endblock content %}

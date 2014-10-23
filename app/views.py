@@ -162,6 +162,12 @@ def events_generate(event_id):
     possible_willing_to_spend.append(preference.willing_to_spend)
     possible_locations.append(preference.location)
 
+  # Get optimal date, first one
+  optimal_date = possible_dates.keys()[0];
+  optimal_date_object = possible_dates[optimal_date]
+  optimal_start_time = optimal_date_object['start_time']
+  optimal_end_time = optimal_date_object['end_time']
+
   # Get optimal willing_to_spend: averages how much everyone is willing to spend
   optimal_willing_to_spend = sum(possible_willing_to_spend)/len(possible_willing_to_spend)
   
@@ -175,5 +181,7 @@ def events_generate(event_id):
   optimal_location_latlng = str(sum(possible_locations_lat)/len(possible_locations_lat)) + ', ' + str(sum(possible_locations_lng)/len(possible_locations_lng))
   optimal_location_full = geolocator.reverse(optimal_location_latlng, timeout=10).raw['address']
   optimal_location = optimal_location_full['city'] + ', ' + optimal_location_full['state']
-  
-  return str(foursquare.venues.explore(params={'query': 'tacos', 'near': 'Frisco, TX', 'limit': '5', 'sortByDistance': '1', 'time': 'any', 'price': '3'})['groups'][0]['items'])
+
+  possible_venues = foursquare.venues.explore(params={'query': '', 'near': optimal_location, 'limit': '5', 'sortByDistance': '1', 'time': 'any', 'price': optimal_willing_to_spend})['groups'][0]['items']
+  return optimal_end_time
+  # return render_template('events_generate.html', possible_venues=possible_venues, optimal_date=optimal_date)
