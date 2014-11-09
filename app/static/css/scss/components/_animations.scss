@@ -1,0 +1,21 @@
+@-webkit-keyframes homepage-iphone {
+  0% {margin-top: 20em;}
+  10%, 15% {margin-top: 16em;}
+  25%, 30% {margin-top: 11.5em;}
+  40%, 45% {margin-top: 7em;}
+  55%, 60% {margin-top: 3.5em;}
+  70%, 75% {margin-top: -1em;}
+  85%, 90% {margin-top: -4.5em;}
+  100% {margin-top: -9em;}
+}
+
+@keyframes homepage-iphone {
+  0% {margin-top: 20em;}
+  10%, 15% {margin-top: 16em;}
+  25%, 30% {margin-top: 11.5em;}
+  40%, 45% {margin-top: 7em;}
+  55%, 60% {margin-top: 3.5em;}
+  70%, 75% {margin-top: -1em;}
+  85%, 90% {margin-top: -4.5em;}
+  100% {margin-top: -9em;}
+}

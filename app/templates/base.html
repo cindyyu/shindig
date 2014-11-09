@@ -1,9 +1,35 @@
-<html>
+<!doctype html>
+<html class="no-js" lang="en">
   <head>
-     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Title</title>
+    <link href='http://fonts.googleapis.com/css?family=Hind:400,300|Ek+Mukta:700' rel='stylesheet' type='text/css'>
+    <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="{{ url_for('static', filename='js/vendor/modernizr.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
   </head>
   <body>
+    <header class="container">
+      <div class="grid">
+        <div class="col col--1-of-5">
+        Shindig
+        </div>
+        <nav class="col col--4-of-5">
+          <a class="btn" href="/">Home</a>
+          <a class="btn" href="/events/create">Create Event</a>
+          <a class="btn" href="/logout">Logout</a>
+        </nav>
+      </div>
+    </header>
     {% block content %}{% endblock %}
+    <footer class="container">
+      <div class="grid">
+        <div class="col--1-of-1 col--centered">
+        footer links here
+        </div>
+      </div>
+    </footer>
   </body>
 </html>

@@ -4,16 +4,20 @@
   {% if error %}
     {{ error }}
   {% else %}
-    your event has beenc reated!
+    Your event has been created!
   {% endif %}
 {% else %}
-<h1>new event</h1>
-<form method="post" action="create">
-    <div>{{ form.name.label }}: {{ form.name }}</div>
-    <div>{{ form.password.label }}: {{ form.password }}</div>
-    <div>{{ form.start.label }}: {{ form.start }}</div>
-    <div>{{ form.end.label }}: {{ form.end }}</div>
-    <input type="submit" name="submit" value="submit" />
-</form>
+    <section class="container features">
+      <div class="grid">
+        <div class="col--1-of-1 col--centered">
+          <h1>Create New Event</h1>
+          <form method="post" action="create">
+            {{ form.name.label }}{{ form.name }}
+            {{ form.password.label }}{{ form.password }}
+            <input type="submit" name="submit" value="submit" />
+          </form>
+        </div>
+      </div>
+    </section>
 {% endif %}
 {% endblock content %}

@@ -1,0 +1,20 @@
+header {
+  background: $white;
+  padding: 2em 0;
+  height: 6.25em;
+  nav {
+    text-align: right; 
+  }
+  .btn {
+    color: $grey;
+    border: 2px solid $white;
+    padding: 0 1em;
+    height: 2.25em;
+    margin-left: .5em;
+    line-height: 2em;
+    &:hover {
+      color: $primary-yellow;
+      border: 2px solid $primary-yellow-light;
+    }
+  }
+}

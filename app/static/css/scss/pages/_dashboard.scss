@@ -1,0 +1,18 @@
+.event {
+  @include border-radius(.5em);
+  background: $white; 
+  margin-top: 1.25em;
+  padding-bottom: .75em;
+  .name {
+    padding: .75em 1.25em;
+    color: $primary-text-light;
+    background: $primary-blue-lightest;
+    border-top-left-radius: .5em;
+    border-top-right-radius: .5em;
+    margin-bottom: .75em;
+    h2 {
+      font-size: 1em;
+      text-transform: uppercase;
+    }
+  }
+}

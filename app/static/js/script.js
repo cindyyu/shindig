@@ -2,13 +2,13 @@ availability = function() {
   var availability = [];
   $('.available_time').each(
     function() {
-      var month = $(this).children('.month').val();
-      var day = $(this).children('.day').val();
-      var year = $(this).children('.year').val();
-      var start_hour = parseInt($(this).children('.start_hour').val());
-      var start_ampm = $(this).children('.start_ampm').val();
-      var end_hour = parseInt($(this).children('.end_hour').val());
-      var end_ampm = $(this).children('.end_ampm').val();
+      var month = $(this).find('.month').val();
+      var day = $(this).find('.day').val();
+      var year = $(this).find('.year').val();
+      var start_hour = parseInt($(this).find('.start_hour').val());
+      var start_ampm = $(this).find('.start_ampm').val();
+      var end_hour = parseInt($(this).find('.end_hour').val());
+      var end_ampm = $(this).find('.end_ampm').val();
       available_time = {};
       if (start_ampm == 'pm') {
         start_hour += 12;
@@ -16,16 +16,21 @@ availability = function() {
       if (end_ampm == 'pm') {
         end_hour += 12;
       }
-      available_time['date'] = month + ':' + day + ':' + year;
+      if (day.lenth == 1) {
+        day = "0" + day;
+      }
+      available_time['date'] = month + '-' + day + '-' + year;
       available_time['start_time'] = start_hour + ':00:00';
       available_time['end_time'] = end_hour + ':00:00';
       availability.push(available_time);
+      console.log(month);
     }
   );
   return JSON.stringify(availability);
 }
 add_available_time = function() {
   $('.available_time:last-child').clone().appendTo('.availability');
+  console.log("hey");
 }
 submit_preferences = function(e) {
   // e.preventDefault();

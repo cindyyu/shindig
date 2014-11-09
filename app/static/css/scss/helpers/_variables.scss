@@ -1,0 +1,26 @@
+// primary site colors
+
+
+// monochromatic
+
+$white: #fff;
+$black: #000;
+
+$grey: #969696; 
+$grey-dark: darken($grey, 5%);
+$grey-light: lighten($grey, 25%);
+$grey-darker: darken($grey, 20%);
+$grey-lighter: lighten($grey, 33%);
+$grey-lightest: lighten($grey, 36%);
+
+$primary-blue: #98bdc4;
+$primary-blue-light: lighten($primary-blue, 10%);
+$primary-blue-lightest: lighten($primary-blue, 20%);
+$primary-light: #f2fbfb;
+$primary-yellow: #e4b43c;
+$primary-yellow-light: lighten($primary-yellow, 10%);
+
+$primary-text: #444444;
+$primary-text-light: #7b7673;
+
+$color-facebook: #47639E;

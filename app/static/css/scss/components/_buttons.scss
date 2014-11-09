@@ -1,0 +1,50 @@
+.btn {
+  @include border-radius(.5em);
+  display: inline-block;
+  text-transform: uppercase;
+  font-family: $font-heading;
+  text-decoration: none;
+
+  &.facebook {
+    color: $color-facebook;
+    border-color: $color-facebook;
+    &:hover {
+      color: $white;
+      background: lighten($color-facebook, 20%);
+      border-color: $white;
+    }
+  }
+  &.grey-light {
+    color: $grey-light;
+    border-color: $grey-light;
+    &:hover {
+      color: $white;
+      background: $grey-light;
+      border-color: $white;
+    }
+  }
+  &.cta {
+    border-style: solid;
+    &:hover {
+      color: $white;
+    }
+    &.small {
+      font-size: .9em;
+      padding: .4em 1em;
+      margin: .75em 0;
+      border-width: 2px;
+    }
+    &.reg {
+      font-size: 1em;
+      padding: .5em 1em;
+      margin: 1em 0;
+      border-width: 3px;
+    }
+    &.large {
+      font-size: 1.2em;
+      padding: .6em 1.2em;
+      margin: 1em 0;
+      border-width: 3px;
+    }
+  }
+}

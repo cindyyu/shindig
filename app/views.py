@@ -58,7 +58,7 @@ def events_create():
   # if form was submitted
   if request.method == 'POST' and form.validate():
     password = sha256_crypt.encrypt(form.password.data) if form.password.data else None
-    new_event = Event(name=form.name.data, host=current_user, start_time=form.start.data, end_time=form.end.data, password=password)
+    new_event = Event(name=form.name.data, host=current_user, password=password)
     db.session.add(new_event)
     db.session.commit()
     return render_template('events_create.html', method='post')
@@ -67,6 +67,18 @@ def events_create():
     return render_template('events_create.html', method='post', error=form.errors)
   else :
     return render_template('events_create.html', form=form, method='get')
+
+@app.route('/events/delete/<int:event_id>', methods=['POST'])
+@login_required
+def events_delete(event_id): 
+  preferences = Preference.query.filter(Preference.event.has(id=event_id))
+  event = Event.query.filter(Event.id == event_id).first()
+  if current_user == event.host : 
+    db.session.delete(event)
+    for preference in preferences :
+      db.session.delete(preference)
+    db.session.commit()
+  return redirect(url_for('dashboard'))
 
 # Join Event: allows user to join an event *** TO ADD: PASSWORD TO JOIN ***
 @app.route('/events/join/<int:event_id>', methods=['GET', 'POST'])
@@ -133,55 +145,78 @@ def events_preferences(event_id):
   else :
     return render_template('events_preferences.html', error='you dont have permission')
 
+# Decide on location and time 
+@app.route('/events/decide/<int:event_id>', methods=['POST'])
+@login_required
+def events_decide(event_id):
+  location_name = request.form.get('location_name')
+  location_address = request.form.get('location_address')
+  preferences = Preference.query.filter(Preference.event.has(id=event_id))
+  event = Event.query.filter(Event.id == event_id).first()
+  if current_user == event.host : 
+    event.location_name = location_name
+    event.location_address = location_address
+    db.session.commit()
+  return redirect(url_for('dashboard'))
+
 # Analyze Preferences
 @app.route('/events/generate/<int:event_id>', methods=['GET', 'POST'])
 @login_required
 def events_generate(event_id):
+  event = Event.query.get(event_id)
   preferences = Preference.query.filter(Preference.event.has(id=event_id))
-  possible_dates = {}
-  possible_locations = []
-  possible_willing_to_spend = []
-  
-  # Gather preferences and place them into lists/dictionaries we can parse through later
-  for preference in preferences :
-    # For each preference, load its available dates
-    available_dates = json.loads(preference.availability)
-    # Add available dates to a dictionary and record the number of people that date works for
-    for available_date in available_dates : 
-      if available_date['date'] in possible_dates :
-        possible_dates[available_date['date']]['attendance'] += 1
-        if available_date['start_time'] > possible_dates[available_date['date']]['start_time'] :
+  if preferences.count() > 1:
+    possible_dates = {}
+    possible_locations = []
+    possible_willing_to_spend = []
+    
+    # Gather preferences and place them into lists/dictionaries we can parse through later
+    for preference in preferences :
+      # For each preference, load its available dates
+      available_dates = json.loads(preference.availability)
+      # Add available dates to a dictionary and record the number of people that date works for
+      for available_date in available_dates : 
+        if available_date['date'] in possible_dates :
+          possible_dates[available_date['date']]['attendance'] += 1
+          if available_date['start_time'] > possible_dates[available_date['date']]['start_time'] :
+            possible_dates[available_date['date']]['start_time'] = available_date['start_time']
+          if available_date['end_time'] < possible_dates[available_date['date']]['end_time'] :
+            possible_dates[available_date['date']]['end_time'] = available_date['end_time']
+        else :
+          possible_dates[available_date['date']] = {}
+          possible_dates[available_date['date']]['attendance'] = 1
           possible_dates[available_date['date']]['start_time'] = available_date['start_time']
-        if available_date['end_time'] < possible_dates[available_date['date']]['end_time'] :
           possible_dates[available_date['date']]['end_time'] = available_date['end_time']
-      else :
-        possible_dates[available_date['date']] = {}
-        possible_dates[available_date['date']]['attendance'] = 1
-        possible_dates[available_date['date']]['start_time'] = available_date['start_time']
-        possible_dates[available_date['date']]['end_time'] = available_date['end_time']
-    possible_willing_to_spend.append(preference.willing_to_spend)
-    possible_locations.append(preference.location)
+      # Get rid of buggy possible dates, like start times after end times
+      true_possible_dates = {}
+      for possible_date in possible_dates :
+        if possible_dates[possible_date]['start_time'] < possible_dates[possible_date]['end_time'] :
+          true_possible_dates[possible_date] = possible_dates[possible_date];
+      possible_dates = true_possible_dates
+      possible_willing_to_spend.append(preference.willing_to_spend)
+      possible_locations.append(preference.location)
 
-  # Get optimal date, first one
-  optimal_date = possible_dates.keys()[0];
-  optimal_date_object = possible_dates[optimal_date]
-  optimal_start_time = optimal_date_object['start_time']
-  optimal_end_time = optimal_date_object['end_time']
+    # Get optimal date, first one
+    optimal_date = possible_dates.keys()[0];
+    optimal_date_object = possible_dates[optimal_date]
+    optimal_start_time = optimal_date_object['start_time']
+    optimal_end_time = optimal_date_object['end_time']
 
-  # Get optimal willing_to_spend: averages how much everyone is willing to spend
-  optimal_willing_to_spend = sum(possible_willing_to_spend)/len(possible_willing_to_spend)
-  
-  # Get optimal location: average latitude and longitude, return its address
-  possible_locations_lat = []
-  possible_locations_lng = []
-  for possible_location in possible_locations : 
-    location = geolocator.geocode(possible_location, timeout=10)
-    possible_locations_lat.append(location.latitude)
-    possible_locations_lng.append(location.longitude)
-  optimal_location_latlng = str(sum(possible_locations_lat)/len(possible_locations_lat)) + ', ' + str(sum(possible_locations_lng)/len(possible_locations_lng))
-  optimal_location_full = geolocator.reverse(optimal_location_latlng, timeout=10).raw['address']
-  optimal_location = optimal_location_full['city'] + ', ' + optimal_location_full['state']
+    # Get optimal willing_to_spend: averages how much everyone is willing to spend
+    optimal_willing_to_spend = sum(possible_willing_to_spend)/len(possible_willing_to_spend)
+    
+    # Get optimal location: average latitude and longitude, return its address
+    possible_locations_lat = []
+    possible_locations_lng = []
+    for possible_location in possible_locations : 
+      location = geolocator.geocode(possible_location, timeout=10)
+      possible_locations_lat.append(location.latitude)
+      possible_locations_lng.append(location.longitude)
+    optimal_location_latlng = str(sum(possible_locations_lat)/len(possible_locations_lat)) + ', ' + str(sum(possible_locations_lng)/len(possible_locations_lng))
+    optimal_location_full = geolocator.reverse(optimal_location_latlng, timeout=25).raw['address']
+    optimal_zip_code = optimal_location_full['postcode']
 
-  possible_venues = foursquare.venues.explore(params={'query': '', 'near': optimal_location, 'limit': '5', 'sortByDistance': '1', 'time': 'any', 'price': optimal_willing_to_spend})['groups'][0]['items']
-  return optimal_end_time
-  # return render_template('events_generate.html', possible_venues=possible_venues, optimal_date=optimal_date)
+    possible_venues = foursquare.venues.explore(params={'query': '', 'near': optimal_zip_code, 'limit': '5', 'sortByDistance': '1', 'time': 'any', 'price': optimal_willing_to_spend})['groups'][0]['items']
+    return render_template('events_generate.html', possible_venues=possible_venues, possible_times=possible_dates, event=event)
+  else : 
+    return 'no preferences submitted'

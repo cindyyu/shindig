@@ -1,12 +1,46 @@
 {% extends 'base.html' %}
 {% block content %}
-  events hosting:
-  {% for event in events_hosting %}
-    {{ event.name }}
-  {% endfor %}
-  <br />
-  events attending: 
-  {% for event in events_attending %}
-    {{ event.name }}
-  {% endfor %}
+    <section class="container features">
+      <div class="grid">
+        <div class="col--1-of-1 col--centered">
+          {% if events_hosting %}
+            <h1>Events You're Hosting</h1>
+            {% for event in events_hosting %}
+            <div class="grid event">
+              <div class="name col--1-of-1 col--centered">
+                <h2><a href="{{ event.url_view() }}">{{ event.name }}</a></h2>
+                <form method="post" action="{{ event.url_delete() }}"><input type="submit" value="delete" /></form>
+              </div>
+              <div class="col--1-of-2">
+                {% for attendee in event.attendees %}
+                  {{ attendee.full_name() }}
+                {% endfor %}
+              </div>
+              <div class="col--1-of-2">
+                {{ event.location }}
+              </div>
+            </div>
+            {% endfor %}
+          {% endif %}
+          {% if events_attending %}
+            <h1>Events You're Attending</h1>
+            {% for event in events_attending %}
+            <div class="grid event">
+              <div class="name col--1-of-1 col--centered">
+                <h2><a href="{{ event.url_view() }}">{{ event.name }}</a></h2>
+              </div>
+              <div class="col--1-of-2">
+                {% for attendee in event.attendees %}
+                  {{ attendee.full_name() }}
+                {% endfor %}
+              </div>
+              <div class="col--1-of-2">
+                info about event
+              </div>
+            </div>
+            {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+    </section>
 {% endblock content %}

@@ -1,0 +1,31 @@
+form {
+  margin: 25px 0;
+  label {
+    display: inline-block;
+    margin-bottom: 10px;
+    padding-right: 15px; 
+    text-align: right; 
+    width: 20%; 
+    & + input[type=text], & + .select_time {
+      display: inline-block;
+      margin-bottom: 10px;
+      width: 80%;
+      padding: 5px 15px 2px; 
+    }
+    & + .select_time {
+      padding-left: 0;
+      .month {
+        width: 20%;
+      }
+      .day, .hour, .minute, .ampm {
+        width: 10%;
+      }
+      .year {
+        width: 15%;
+      }
+    }
+  }
+  input[type=radio] + label {
+    width: auto;
+  }
+}

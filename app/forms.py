@@ -3,9 +3,7 @@ from wtforms import Form, StringField, DateTimeField, RadioField, validators
 
 class EventCreateForm(Form):
   name = StringField('Name')
-  start = DateTimeField('Start Time', [validators.optional()])
   password = StringField('Password')
-  end = DateTimeField('End Time', [validators.optional()])
 
 class EventJoinForm(Form):
   password = StringField('Password')

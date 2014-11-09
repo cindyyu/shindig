@@ -46,9 +46,11 @@ class Event(db.Model):
   __tablename__ = 'event'
   id = db.Column(db.Integer, primary_key=True)
   name = db.Column(db.String)
+  date = db.Column(db.DateTime)
   start_time = db.Column(db.DateTime)
   end_time = db.Column(db.DateTime)
-  location = db.Column(db.String)
+  location_name = db.Column(db.String)
+  location_address = db.Column(db.String)
   password = db.Column(db.String)
   categories = db.Column(db.PickleType)
   user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
@@ -59,17 +61,19 @@ class Event(db.Model):
   )
   preferences = db.relationship('Preference', backref='event', lazy='dynamic')
 
-  def __init__(self, name, host, start_time=None, end_time=None, location=None, password=None, categories=None): 
+  def __init__(self, name, host, date=None, start_time=None, end_time=None, location_name=None, location_address=None, password=None, categories=None): 
     self.name = name
     self.host = host
-    self.start_time = start_time
-    self.end_time = end_time
-    self.location = location
     self.password = password
-    self.categories = categories
 
   def url_view(self):
     return '/events/view/' + str(self.id)
+
+  def url_delete(self):
+    return '/events/delete/' + str(self.id)
+
+  def url_decide(self):
+    return '/events/decide/' + str(self.id)
 
 # Preferences
 class Preference(db.Model):

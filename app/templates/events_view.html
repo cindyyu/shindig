@@ -1,11 +1,16 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1>view event</h1>
-{% if error %}
-  {{ error }}
-{% else %}
-  Name: {{ event.name }}<br />
-  Attendees: 
-  {{ attendees }}
-{% endif %}
+    <section class="container features">
+      <div class="grid">
+        <div class="col--1-of-1 col--centered">
+          <h1>{{ event.name }}</h1>
+          {% if error %}
+            {{ error }}
+          {% else %}
+            Attendees: 
+            {{ attendees }}
+          {% endif %}
+        </div>
+      </div>
+    </section>
 {% endblock content %}
