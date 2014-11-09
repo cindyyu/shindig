@@ -1,3 +1,4 @@
+import calendar, json, urllib2, os, foursquare, datetime
 from flask import render_template, request, session, url_for, redirect
 from flask_login import login_required, current_user
 from app import app
@@ -9,7 +10,6 @@ from sqlalchemy import desc
 from passlib.hash import sha256_crypt
 from datetime import date
 from geopy.geocoders import Nominatim
-import calendar, json, urllib2, os, foursquare
 
 geolocator = Nominatim()
 foursquare = foursquare.Foursquare(client_id='4032XFZSOCNLGS2F2TDYZOCTRRMACK4T4QK5P4HJZSG4SBS5', client_secret='PIOKXJENSWXYEYIUWW3GQFTAUHCLOLVIOCEOOMEPK3EHMUQV')
@@ -68,6 +68,7 @@ def events_create():
   else :
     return render_template('events_create.html', form=form, method='get')
 
+# Delete Event: allows host to delete an event
 @app.route('/events/delete/<int:event_id>', methods=['POST'])
 @login_required
 def events_delete(event_id): 
@@ -151,11 +152,19 @@ def events_preferences(event_id):
 def events_decide(event_id):
   location_name = request.form.get('location_name')
   location_address = request.form.get('location_address')
+  date = request.form.get('date')
+  start_time = request.form.get('start_time')
+  end_time = request.form.get('end_time')
   preferences = Preference.query.filter(Preference.event.has(id=event_id))
   event = Event.query.filter(Event.id == event_id).first()
   if current_user == event.host : 
-    event.location_name = location_name
-    event.location_address = location_address
+    if location_name and location_address : 
+      event.location_name = location_name
+      event.location_address = location_address
+    if date and start_time and end_time :
+      event.date = datetime.datetime.strptime(date, "%m-%d-%Y").date()
+      event.start_time = datetime.datetime.strptime(start_time, '%H:%M:%S').time()
+      event.end_time = datetime.datetime.strptime(end_time, '%H:%M:%S').time()
     db.session.commit()
   return redirect(url_for('dashboard'))
 
@@ -209,14 +218,19 @@ def events_generate(event_id):
     possible_locations_lat = []
     possible_locations_lng = []
     for possible_location in possible_locations : 
-      location = geolocator.geocode(possible_location, timeout=10)
+      location = geolocator.geocode(possible_location, timeout=20)
       possible_locations_lat.append(location.latitude)
       possible_locations_lng.append(location.longitude)
     optimal_location_latlng = str(sum(possible_locations_lat)/len(possible_locations_lat)) + ', ' + str(sum(possible_locations_lng)/len(possible_locations_lng))
     optimal_location_full = geolocator.reverse(optimal_location_latlng, timeout=25).raw['address']
-    optimal_zip_code = optimal_location_full['postcode']
+    if 'postcode' in optimal_location_full.keys() : 
+      optimal_location = optimal_location_full['postcode']
+    elif 'city' in optimal_location_full.keys() : 
+      optimal_location = optimal_location_full['city']
+    else : 
+      optimal_location = optimal_location_full['county']
 
-    possible_venues = foursquare.venues.explore(params={'query': '', 'near': optimal_zip_code, 'limit': '5', 'sortByDistance': '1', 'time': 'any', 'price': optimal_willing_to_spend})['groups'][0]['items']
+    possible_venues = foursquare.venues.explore(params={'query': '', 'near': optimal_location, 'limit': '5', 'sortByDistance': '1', 'time': 'any', 'price': optimal_willing_to_spend})['groups'][0]['items']
     return render_template('events_generate.html', possible_venues=possible_venues, possible_times=possible_dates, event=event)
   else : 
     return 'no preferences submitted'

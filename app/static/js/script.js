@@ -16,7 +16,7 @@ availability = function() {
       if (end_ampm == 'pm') {
         end_hour += 12;
       }
-      if (day.lenth == 1) {
+      if (parseInt(day) < 10) {
         day = "0" + day;
       }
       available_time['date'] = month + '-' + day + '-' + year;

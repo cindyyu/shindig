@@ -14,10 +14,12 @@
     <header class="container">
       <div class="grid">
         <div class="col col--1-of-5">
-        Shindig
+          <a href="/">
+            <img src="{{ url_for('static', filename='images/logo_small.png') }}" alt="Shindig Logo" />
+          </a>
         </div>
         <nav class="col col--4-of-5">
-          <a class="btn" href="/">Home</a>
+          <a class="btn" href="/">Dashboard</a>
           <a class="btn" href="/events/create">Create Event</a>
           <a class="btn" href="/logout">Logout</a>
         </nav>
@@ -27,7 +29,7 @@
     <footer class="container">
       <div class="grid">
         <div class="col--1-of-1 col--centered">
-        footer links here
+          <a href="/">home</a> | <a href="/login">sign up</a> | <a href="about">about</a>
         </div>
       </div>
     </footer>

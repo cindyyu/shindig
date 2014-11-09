@@ -21,7 +21,15 @@
           {% endfor %}
           <h2>best time</h2>
           {% for possible_time in possible_times %}
-            {{ possible_time }} start time: {{ possible_times[possible_time]['start_time'] }}
+            {{ possible_time }} <br />
+            start time: {{ possible_times[possible_time]['start_time'] }}<br />
+            end time: {{ possible_times[possible_time]['end_time'] }}
+            <form method="post" action="{{ event.url_decide() }}">
+              <input type="hidden" value="{{ possible_time }}" name="date" />
+              <input type="hidden" value="{{ possible_times[possible_time]['start_time'] }}" name="start_time" />
+              <input type="hidden" value="{{ possible_times[possible_time]['end_time'] }}" name="end_time" />
+              <input type="submit" value="choose this date" />
+            </form>
           {% endfor %}  
         </div>
       </div>

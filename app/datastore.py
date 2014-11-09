@@ -46,9 +46,9 @@ class Event(db.Model):
   __tablename__ = 'event'
   id = db.Column(db.Integer, primary_key=True)
   name = db.Column(db.String)
-  date = db.Column(db.DateTime)
-  start_time = db.Column(db.DateTime)
-  end_time = db.Column(db.DateTime)
+  date = db.Column(db.Date)
+  start_time = db.Column(db.Time)
+  end_time = db.Column(db.Time)
   location_name = db.Column(db.String)
   location_address = db.Column(db.String)
   password = db.Column(db.String)

@@ -1,6 +1,14 @@
 footer {
-  background: $primary-blue;
-  color: $white;
+  color: $grey;
   padding: 1em 0;
   text-align: center;
+  a {
+    color: $grey; 
+    text-transform: lowercase; 
+    font-size: .8em;
+    text-decoration: none; 
+    &:hover {
+      color: $primary-blue;
+    }
+  }
 }
