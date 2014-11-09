@@ -1,18 +1,18 @@
+import calendar, json, urllib2, os, foursquare
 from flask import render_template, request, session, url_for, redirect
 from flask_login import login_required, current_user
 from app import app
 from app import db
-from app import forms, datastore
+from app import forms, datastore, api
+from api import foursquare
 from forms import EventCreateForm, EventPreferenceForm, EventJoinForm
 from datastore import Event, User, attendance, Preference
 from sqlalchemy import desc
 from passlib.hash import sha256_crypt
 from datetime import date
 from geopy.geocoders import Nominatim
-import calendar, json, urllib2, os, foursquare
 
 geolocator = Nominatim()
-foursquare = foursquare.Foursquare(client_id='4032XFZSOCNLGS2F2TDYZOCTRRMACK4T4QK5P4HJZSG4SBS5', client_secret='PIOKXJENSWXYEYIUWW3GQFTAUHCLOLVIOCEOOMEPK3EHMUQV')
 
 def is_attendee_or_host(user, event):
   if user == event.host or user in event.attendees :
