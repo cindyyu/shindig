@@ -2,43 +2,73 @@
 {% block content %}
     <section class="container features">
       <div class="grid">
-        <div class="col--1-of-1 col--centered">
+        <div class="col--1-of-2">
+          <h1>Events You're Hosting</h1>
           {% if events_hosting %}
-            <h1>Events You're Hosting</h1>
             {% for event in events_hosting %}
             <div class="grid event">
+              <div class="corner"></div>
               <div class="name col--1-of-1 col--centered">
                 <h2><a href="{{ event.url_view() }}">{{ event.name }}</a></h2>
-                <form method="post" action="{{ event.url_delete() }}"><input type="submit" value="delete" /></form>
               </div>
               <div class="col--1-of-2">
+                <h3>Attendees</h3>
+                <strong>host</strong> {{ event.host.full_name() }}<br />
                 {% for attendee in event.attendees %}
-                  {{ attendee.full_name() }}
+                  {{ attendee.full_name() }}<br />
                 {% endfor %}
               </div>
               <div class="col--1-of-2">
-                {{ event.location }}
+                <h3>Details</h3>
+                <strong>Location</strong>
+                {{ event.location_name }}<br />
+                <strong>Date</strong>
+                {{ event.date }}<br />
+                <strong>Start Time</strong>
+                {{ event.start_time }}<br />
+                <strong>End Time</strong>
+                {{ event.end_time }}
               </div>
+              <form method="post" action="{{ event.url_delete() }}">
+                <input class="btn delete" type="submit" value="delete" />
+              </form>
             </div>
             {% endfor %}
+          {% else %}
+            You are not hosting any events!
           {% endif %}
+        </div>
+        <div class="col--1-of-2">
+          <h1>Events You're Attending</h1>
           {% if events_attending %}
-            <h1>Events You're Attending</h1>
             {% for event in events_attending %}
             <div class="grid event">
+              <div class="corner"></div>
               <div class="name col--1-of-1 col--centered">
                 <h2><a href="{{ event.url_view() }}">{{ event.name }}</a></h2>
               </div>
               <div class="col--1-of-2">
+                <h3>Attendees</h3>
+                <strong>host</strong> {{ event.host.full_name() }}<br />
                 {% for attendee in event.attendees %}
-                  {{ attendee.full_name() }}
+                  {{ attendee.full_name() }}<br />
                 {% endfor %}
               </div>
               <div class="col--1-of-2">
-                info about event
+                <h3>Details</h3>
+                <strong>Location</strong>
+                {{ event.location_name }}<br />
+                <strong>Date</strong>
+                {{ event.date }}<br />
+                <strong>Start Time</strong>
+                {{ event.start_time }}<br />
+                <strong>End Time</strong>
+                {{ event.end_time }}
               </div>
             </div>
             {% endfor %}
+          {% else %}
+            You are not attending any events!
           {% endif %}
         </div>
       </div>

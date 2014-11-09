@@ -19,8 +19,14 @@ $primary-blue-lightest: lighten($primary-blue, 20%);
 $primary-light: #f2fbfb;
 $primary-yellow: #e4b43c;
 $primary-yellow-light: lighten($primary-yellow, 10%);
+$primary-yellow-lightest: lighten($primary-yellow, 35%);
 
 $primary-text: #444444;
 $primary-text-light: #7b7673;
 
 $color-facebook: #47639E;
+
+$options-red: red; 
+$options-green: green; 
+$options-yellow: yellow; 
+$options-blue: blue; 

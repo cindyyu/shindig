@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Title</title>
-    <link href='http://fonts.googleapis.com/css?family=Hind:400,300|Ek+Mukta:700' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Hind:400,300|Ek+Mukta:400' rel='stylesheet' type='text/css'>
     <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet"></script>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script src="{{ url_for('static', filename='js/vendor/modernizr.js') }}"></script>
@@ -30,6 +30,9 @@
       <div class="grid">
         <div class="col--1-of-1 col--centered">
           <a href="/">home</a> | <a href="/login">sign up</a> | <a href="about">about</a>
+          <a class="foursquare" href="http://www.foursquare.com">
+            <img src="{{ url_for('static', filename='images/foursquare.png') }}" alt="Powered by Foursquare" />
+          </a>
         </div>
       </div>
     </footer>

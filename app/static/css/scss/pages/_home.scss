@@ -23,32 +23,8 @@
 .features {
   background: $primary-light;
   padding: 2.5em 0;
-  .feature {
-    @include border-radius(1em);
-    display: table;
-    margin: 1em 2%;
-    padding: 1em 2%;
-    width: 90%;
-    height: 12em;
-    background: white;
-    .icon {
-      width: 5em;
-    }
-    div {
-      p {
-        font-size: .8em;
-      }
-      h1 {
-        color: $primary-text-light;
-        font-size: 1em;
-        margin: .5em 0;
-      }
-    }
-    div, .icon {
-      display: table-cell;
-      vertical-align: middle;
-      height: 100%;
-    }
+  h1 {
+    font-size: 1.3em;
   }
 }
 

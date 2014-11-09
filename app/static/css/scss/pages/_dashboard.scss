@@ -1,18 +1,61 @@
 .event {
-  @include border-radius(.5em);
-  background: $white; 
-  margin-top: 1.25em;
+  background: $white;
+  margin: 1.25em auto;
   padding-bottom: .75em;
+  position: relative; 
+  width: 95%; 
+  padding: 1em 0;
+  .corner {
+    width: 0; 
+    height: 0; 
+    position: absolute; 
+    top: 0; 
+    right: 0; 
+    background: $primary-light;
+    border-left: 0px $white solid; 
+    border-bottom: 25px $white solid; 
+    border-right: 25px transparent solid; 
+    border-top: 0 transparent solid; 
+    &:before {
+      width: 25px; 
+      height: 25px; 
+      position: absolute; 
+      z-index: 5;
+      top: 0; 
+      right: -25px; 
+      content: "";
+      border-bottom: 3px solid $primary-light;
+      border-left: 3px solid $primary-light;
+    }
+  }
   .name {
-    padding: .75em 1.25em;
     color: $primary-text-light;
-    background: $primary-blue-lightest;
-    border-top-left-radius: .5em;
-    border-top-right-radius: .5em;
     margin-bottom: .75em;
     h2 {
-      font-size: 1em;
+      a {
+        color: $primary-yellow;
+      }
+      font-size: 1.25em;
       text-transform: uppercase;
+    }
+  }
+  strong {
+    color: $primary-text-light;
+    font-size: .85em;
+    text-transform: uppercase;
+  }
+  form {
+    margin: 1em 0 0;
+    display: inline-block;
+    .btn {
+      border: 0; 
+      background: none;
+      text-transform: lowercase;
+      &:hover {
+        &.delete {
+          color: $options-red;
+        }
+      }
     }
   }
 }
