@@ -14,6 +14,8 @@ $grey-lighter: lighten($grey, 33%);
 $grey-lightest: lighten($grey, 36%);
 
 $primary-blue: #98bdc4;
+$primary-blue-darkest: darken($primary-blue, 20%);
+$primary-blue-dark: darken($primary-blue, 10%);
 $primary-blue-light: lighten($primary-blue, 10%);
 $primary-blue-lightest: lighten($primary-blue, 20%);
 $primary-light: #f2fbfb;

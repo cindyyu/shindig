@@ -710,10 +710,10 @@ footer {
   .hero p {
     margin: 1em 0; }
 
-.features {
+.main {
   background: #f2fbfb;
   padding: 2.5em 0; }
-  .features h1 {
+  .main h1 {
     font-size: 1.3em; }
 
 div#iphone {
@@ -866,14 +866,24 @@ div#iphone {
     font-size: .85em;
     text-transform: uppercase; }
   .event form {
-    margin: 1em 0 0;
-    display: inline-block; }
-    .event form .btn {
-      font: 0.85em "Hind", Helvetica, Arial, sans-serif;
-      border: 0;
-      background: none;
-      text-transform: lowercase; }
-      .event form .btn:hover.delete {
-        color: red; }
+    display: inline-block;
+    padding: 0;
+    margin: 0; }
+  .event form .btn, .event a.event_action_links {
+    margin: 1em 1em 0;
+    font: 0.85em "Hind", Helvetica, Arial, sans-serif;
+    border: 0;
+    background: none;
+    text-transform: lowercase; }
+    .event form .btn:hover.delete, .event a.event_action_links:hover.delete {
+      color: red; }
+
+.events.view h1 {
+  color: #78a8b1;
+  font-size: 1.5em;
+  margin-bottom: 1em;
+  text-transform: uppercase; }
+.events.view h2 {
+  font-size: 1.25em; }
 
 /*# sourceMappingURL=main.css.map */

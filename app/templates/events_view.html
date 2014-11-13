@@ -1,16 +1,59 @@
 {% extends 'base.html' %}
 {% block content %}
-    <section class="container features">
+    <section class="container main events view">
       <div class="grid">
         <div class="col--1-of-1 col--centered">
           <h1>{{ event.name }}</h1>
           {% if error %}
             {{ error }}
           {% else %}
-            Attendees: 
-            {% for attendee in attendees %}
-              {{ attendee.full_name() }}<br />
-            {% endfor %}
+            <div class="grid">
+              <div class="col--1-of-2">
+                <h2>Event Details</h2>
+                The following users have entered their preferences:<br />
+                {% for preference in preferences %}
+                  {{ preference.attendee.full_name() }}
+                {% endfor %}
+                <br />
+                Invite friends by sharing the following link and the password you chose when you first set up the event!<br />
+                <strong>Share Link</strong> asdfdf
+              </div>
+              <div class="col--1-of-2">
+                <h2>Event Details</h2>
+                {% if event.location and event.date and event.start_time and event.end_time %}
+                  <strong>Location</strong>
+                  {% if event.location %}
+                    {{ event.location }}
+                  {% else %}
+                    None
+                  {% endif %}<br />
+                  <strong>Date</strong>
+                  {% if event.date %}
+                    {{ event.date }}
+                  {% else %}
+                    None
+                  {% endif %}<br />
+                  <strong>Start Time</strong>
+                  {% if event.start_time %}
+                    {{ event.start_time }}
+                  {% else %}
+                    None
+                  {% endif %}<br />
+                  <strong>End Time</strong>
+                  {% if event.end_time %}
+                    {{ event.end_time }}
+                  {% else %}
+                    None
+                  {% endif %}
+                {% else %}
+                  {% if preference | count > 1 %}
+                    hi 
+                  {% else %}
+                    At least two attendees must enter their preferences before we can generate an event itinerary for you!
+                  {% endif %}
+                {% endif %}
+              </div>
+            </div>
           {% endif %}
         </div>
       </div>

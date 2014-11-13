@@ -20,6 +20,12 @@ def is_attendee_or_host(user, event):
   else :
     return False
 
+def is_host(user, event): 
+  if user == event.host : 
+    return True
+  else : 
+    return False
+
 @app.route('/')
 @app.route('/index')
 def index():
@@ -43,9 +49,9 @@ def events_view(event_id):
   event = Event.query.get(event_id)
   preferences = Preference.query.filter(Preference.event.has(id=event_id))
   # check if this person is an attendee or host
+  user_is_host = is_host(current_user, event)
   if is_attendee_or_host(current_user, event) :
-    attendees = []
-    return render_template('events_view.html', event=event, attendees=event.attendees)
+    return render_template('events_view.html', event=event, preferences=preferences, is_host=user_is_host)
   else :
     return render_template('events_view.html', error='you dunbelong')
   

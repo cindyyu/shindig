@@ -1,0 +1,13 @@
+.events {
+  &.view {
+    h1 {
+      color: $primary-blue-dark;
+      font-size: 1.5em;
+      margin-bottom: 1em;
+      text-transform: uppercase; 
+    }
+    h2 {
+      font-size: 1.25em;
+    }
+  }
+}

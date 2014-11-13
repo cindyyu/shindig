@@ -45,17 +45,19 @@
     text-transform: uppercase;
   }
   form {
-    margin: 1em 0 0;
     display: inline-block;
-    .btn {
-      font: .85em $font-primary;
-      border: 0; 
-      background: none;
-      text-transform: lowercase;
-      &:hover {
-        &.delete {
-          color: $options-red;
-        }
+    padding: 0;
+    margin: 0; 
+  }
+  form .btn, a.event_action_links {
+    margin: 1em 1em 0;
+    font: .85em $font-primary;
+    border: 0; 
+    background: none;
+    text-transform: lowercase;
+    &:hover {
+      &.delete {
+        color: $options-red;
       }
     }
   }
