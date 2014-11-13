@@ -869,6 +869,7 @@ div#iphone {
     margin: 1em 0 0;
     display: inline-block; }
     .event form .btn {
+      font: 0.85em "Hind", Helvetica, Arial, sans-serif;
       border: 0;
       background: none;
       text-transform: lowercase; }

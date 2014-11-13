@@ -41,12 +41,11 @@ def dashboard():
 @login_required
 def events_view(event_id):
   event = Event.query.get(event_id)
+  preferences = Preference.query.filter(Preference.event.has(id=event_id))
   # check if this person is an attendee or host
   if is_attendee_or_host(current_user, event) :
-    attendees = ''
-    for attendee in event.attendees : 
-      attendees = attendees + attendee.full_name()
-    return render_template('events_view.html', event=event, attendees=attendees)
+    attendees = []
+    return render_template('events_view.html', event=event, attendees=event.attendees)
   else :
     return render_template('events_view.html', error='you dunbelong')
   

@@ -8,7 +8,9 @@
             {{ error }}
           {% else %}
             Attendees: 
-            {{ attendees }}
+            {% for attendee in attendees %}
+              {{ attendee.full_name() }}<br />
+            {% endfor %}
           {% endif %}
         </div>
       </div>
