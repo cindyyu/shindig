@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 import calendar, json, urllib2, os, foursquare, datetime
-=======
-import calendar, json, urllib2, os, foursquare
->>>>>>> 34693149b9bfaa07b44e254c30031527deaf9acf
 from flask import render_template, request, session, url_for, redirect
 from flask_login import login_required, current_user
 from app import app
