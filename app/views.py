@@ -34,6 +34,10 @@ def index():
   else :
     return redirect('/dashboard')
 
+@app.route('/about')
+def about():
+  return render_template('about.html')
+
 # Dashboard: displays the events the user is either hosting or attending
 @app.route('/dashboard')
 @login_required

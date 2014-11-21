@@ -1,0 +1,44 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shindig | don't plan</title>
+    <link href='http://fonts.googleapis.com/css?family=Hind:400,300|Ek+Mukta:700' rel='stylesheet' type='text/css'>
+    <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet"></script>
+    <script src="{{ url_for('static', filename='js/vendor/modernizr.js') }}"></script>
+  </head>
+  <body>
+    <header class="container">
+      <div class="grid">
+        <div class="col col--1-of-5">
+          <a href="/">
+            <img src="{{ url_for('static', filename='images/logo_small.png') }}" alt="Shindig Logo" />
+          </a>
+        </div>
+        <nav class="col col--4-of-5">
+          <a class="btn" href="/login">Get Started</a>
+        </nav>
+      </div>
+    </header>
+    <section class="container hero">
+      <div class="grid">
+        <div class="col col--1-of-1">
+          This is a fun side project of <a href="http://www.cindyyu.com" target="_blank">Cindy</a>'s.
+        </div>
+      </div>
+    </section>
+    <footer class="container">
+      <div class="grid">
+        <div class="col--1-of-1 col--centered">
+          <a href="/">home</a> | <a href="/login">sign up</a> | <a href="about">about</a>
+          <a class="foursquare" href="http://www.foursquare.com">
+            <img src="{{ url_for('static', filename='images/foursquare.png') }}" alt="Powered by Foursquare" />
+          </a>
+        </div>
+      </div>
+    </footer>
+      
+    <script src="js/vendor/jquery.js"></script>
+  </body>
+</html>
