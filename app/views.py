@@ -48,10 +48,11 @@ def dashboard():
 def events_view(event_id):
   event = Event.query.get(event_id)
   preferences = Preference.query.filter(Preference.event.has(id=event_id))
+  num_preferences = preferences.count()
   # check if this person is an attendee or host
   user_is_host = is_host(current_user, event)
   if is_attendee_or_host(current_user, event) :
-    return render_template('events_view.html', event=event, preferences=preferences, is_host=user_is_host)
+    return render_template('events_view.html', event=event, num_preferences=num_preferences, preferences=preferences, is_host=user_is_host, current_user=current_user)
   else :
     return render_template('events_view.html', error='you dunbelong')
   
@@ -100,15 +101,15 @@ def events_join(event_id):
         if sha256_crypt.verify(form.password.data, event.password) :
           event.attendees.append(current_user)
           db.session.commit()
-          return render_template('events_join.html', response='you have joined!')
+          return render_template('events_join.html', event=event, response='you have joined!')
         else :
           return render_template('events_join.html', response='wrong pass yo!')
       else :
         event.attendees.append(current_user)
         db.session.commit()
-        return render_template('events_join.html', response='you have joined!')
+        return render_template('events_join.html', event=event, response='you have joined!')
     else : 
-      return render_template('events_join.html', form=form, event_id=event_id, method='get')
+      return render_template('events_join.html', form=form, event=event, event_id=event_id, method='get')
   else :
     return redirect(url_for('events_view', event_id=event_id))
 
@@ -116,9 +117,11 @@ def events_join(event_id):
 @app.route('/events/leave/<int:event_id>')
 @login_required
 def events_leave(event_id):
+  preference = Preference.query.filter(Preference.event.has(id=event_id)).filter(Preference.attendee.has(id=current_user.id)).first()
   event = Event.query.filter(Event.id == event_id).first()
   if current_user in event.attendees :
     event.attendees.remove(current_user)
+    db.session.delete(preference)
     db.session.commit()
     return render_template('events_leave.html', response='you have been removed!')
   else :
@@ -205,16 +208,17 @@ def events_generate(event_id):
       true_possible_dates = {}
       for possible_date in possible_dates :
         if possible_dates[possible_date]['start_time'] < possible_dates[possible_date]['end_time'] :
-          true_possible_dates[possible_date] = possible_dates[possible_date];
+          true_possible_dates[possible_date] = possible_dates[possible_date]
+
       possible_dates = true_possible_dates
       possible_willing_to_spend.append(preference.willing_to_spend)
       possible_locations.append(preference.location)
 
     # Get optimal date, first one
-    optimal_date = possible_dates.keys()[0];
-    optimal_date_object = possible_dates[optimal_date]
-    optimal_start_time = optimal_date_object['start_time']
-    optimal_end_time = optimal_date_object['end_time']
+    # optimal_date = possible_dates.keys()[0];
+    # optimal_date_object = possible_dates[optimal_date]
+    # optimal_start_time = optimal_date_object['start_time']
+    # optimal_end_time = optimal_date_object['end_time']
 
     # Get optimal willing_to_spend: averages how much everyone is willing to spend
     optimal_willing_to_spend = sum(possible_willing_to_spend)/len(possible_willing_to_spend)

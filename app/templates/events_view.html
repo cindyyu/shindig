@@ -1,22 +1,31 @@
 {% extends 'base.html' %}
+{% block title %}
+  {% if event %}
+    {{ event.name }}
+  {% else %}
+    Error 
+  {% endif %}
+{% endblock %}
 {% block content %}
     <section class="container main events view">
       <div class="grid">
         <div class="col--1-of-1 col--centered">
+          {% if event %}
           <h1>{{ event.name }}</h1>
-          {% if error %}
-            {{ error }}
-          {% else %}
             <div class="grid">
               <div class="col--1-of-2">
                 <h2>Event Details</h2>
                 The following users have entered their preferences:<br />
                 {% for preference in preferences %}
                   {{ preference.attendee.full_name() }}
+                  {% if preference.attendee == current_user %}
+                  {% endif %}
                 {% endfor %}
-                <br />
-                Invite friends by sharing the following link and the password you chose when you first set up the event!<br />
-                <strong>Share Link</strong> asdfdf
+                {% if is_host %}
+                  <br /><br />
+                  Invite friends by sharing the following link and the password you chose when you first set up the event!<br />
+                  <strong>Share Link</strong> asdfdf
+                {% endif %}
               </div>
               <div class="col--1-of-2">
                 <h2>Event Details</h2>
@@ -46,14 +55,22 @@
                     None
                   {% endif %}
                 {% else %}
-                  {% if preference | count > 1 %}
-                    hi 
+                  {% for preference in preferences %}
+                    {% if preference.attendee == current_user %}
+                      {% set preference_set = True %}
+                    {% endif %}
+                  {% endfor %}
+                  {% if num_preferences > 1 %}
+                    yay more than 1 preference submitted
                   {% else %}
                     At least two attendees must enter their preferences before we can generate an event itinerary for you!
                   {% endif %}
                 {% endif %}
+                <a href="{{ event.url_preferences() }}">add your preferences</a>
               </div>
             </div>
+          {% else %}
+            {{ error }}
           {% endif %}
         </div>
       </div>

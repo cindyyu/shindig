@@ -75,6 +75,9 @@ class Event(db.Model):
   def url_decide(self):
     return '/events/decide/' + str(self.id)
 
+  def url_preferences(self):
+    return '/events/preferences/' + str(self.id)
+
 # Preferences
 class Preference(db.Model):
   __tablename__ = 'preference'
