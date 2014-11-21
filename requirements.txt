@@ -9,9 +9,16 @@ MarkupSafe==0.23
 SQLAlchemy==0.9.7
 WTForms==2.0.1
 Werkzeug==0.9.6
+facebook-sdk==0.4.0
+foursquare==20130707
+geopy==1.1.2
 gunicorn==19.1.1
 httplib2==0.9
 itsdangerous==0.24
 oauth2==1.5.211
 oauthlib==0.6.3
+passlib==1.6.2
+poster==0.8.1
+requests==2.3.0
+six==1.7.3
 wsgiref==0.1.2

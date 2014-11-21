@@ -5,7 +5,6 @@ from app import app
 from app import datastore
 from app import db
 from datastore import User
-import facebook
 from facebook import GraphAPI
 
 # Flask-Login Configuration
