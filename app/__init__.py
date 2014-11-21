@@ -7,6 +7,6 @@ app.config.from_object('config')
 db = SQLAlchemy(app)
 
 from app import datastore
-from app import admin
+# from app import admin
 from app import login
 from app import views
